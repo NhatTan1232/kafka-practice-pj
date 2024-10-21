@@ -28,11 +28,13 @@ if __name__ == '__main__':
     surveyDf.createOrReplaceTempView("survey_view")
     countDf = spark.sql(
         """
-        select Country, count(1) as Male_number
+        select 
+            Country, 
+            count(case when lower(Gender) in ('m', 'male') then 1 end) AS Male_count,
+            count(case when lower(Gender) in ('female', 'w', 'women') then 1 end) AS Female_count
         from survey_view 
-        where Age < 40 and lower(Gender) in ("male", "m")
         group by Country
-        order by Male_number desc, Country
+        order by Country
         """)
 
     log.info("countDf: ")
